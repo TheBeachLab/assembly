@@ -1,0 +1,66 @@
+gavrasm Gerd's AVR assembler version 4.6 (C)2019 by DG4FAC
+----------------------------------------------------------
+Source file: blink.asm
+Hex file:    blink.hex
+Eeprom file: blink.eep
+Compiled:    24.05.2020, 18:58:15
+Pass:        2
+     1: .INCLUDE "m328pdef.inc"
+ -> Warning 009: Include defs not necessary, using internal values!
+   File: blink.asm, Line: 1
+   Source line: .INCLUDE "m328pdef.inc"
+     2: .ORG 0x0000 
+     3: ; the next instruction has to be written to                       
+     4: ; address 0x0000
+     5: 
+     6: 000000   C000  rjmp START	; the reset vector: jump to "main"
+     7: 
+     8: START:
+     9: 
+    10: 000001   EF0F  ldi r16, low(RAMEND)	; set up the stack
+    11: 
+    12: 000002   BF0D  out SPL, r16
+    13: 000003   E008  ldi r16, high(RAMEND)
+    14: 000004   BF0E  out SPH, r16
+    15: 000005   EF0F  ldi r16, 0xFF	; load register 16 with 0xFF (all bits 1)
+    16: 
+    17: 000006   B904  out DDRB, r16
+    18: ; write the value in r16 (0xFF) to Data                       
+    19: ; Direction Register B
+    20: 
+    21: LOOP:  
+    22: 000007   9A2D  sbi PortB, 5	; switch off the LED  
+    23: 000008   D003  rcall delay_05	; wait for half a second  
+    24: 000009   982D  cbi PortB, 5	; switch it on  
+    25: 00000A   D001  rcall delay_05	; wait for half a second  
+    26: 00000B   CFFB  rjmp LOOP	; jump to loop
+    27: 
+    28: DELAY_05:	; the subroutine:  
+    29: 00000C   E10F  ldi r16, 31	; load r16 with 31
+    30: 
+    31: OUTER_LOOP:	; outer loop label  
+    32: 00000D   EF8D  ldi r24, low(1021)	; load registers r24:r25 with 1021, our new                       
+    33: 			; init value  
+    34: 00000E   E093  ldi r25, high(1021)	
+    35: 
+    36: ; the loop label
+    37: DELAY_LOOP:            
+    38: ; "add immediate to word": r24:r25 are                       
+    39: ; incremented  
+    40: 00000F   9601  adiw r24, 1          
+    41: 
+    42: ; if no overflow ("branch if not equal"), go                       
+    43: ; back to "delay_loop"  
+    44: 000010   F7F1  brne DELAY_LOOP  
+    45: 
+    46: 000011   950A  dec r16	; decrement r16  
+    47: 000012   F7D1  brne OUTER_LOOP	; and loop if outer loop not finished  
+    48: 000013   9508  ret		; return from subroutine
+
+Program             :       20 words.
+Constants           :        0 words.
+Total program memory:       20 words.
+Eeprom space        :        0 bytes.
+Data segment        :        0 bytes.
+Compilation completed, no errors.
+Compilation endet 24.05.2020, 18:58:15

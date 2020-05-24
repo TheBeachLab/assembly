@@ -1,0 +1,28 @@
+gavrasm Gerd's AVR assembler version 4.6 (C)2019 by DG4FAC
+----------------------------------------------------------
+Source file: hello.asm
+Hex file:    hello.hex
+Eeprom file: hello.eep
+Compiled:    24.05.2020, 18:06:18
+Pass:        2
+     1: ;hello.asm
+     2: ;  turns on an LED which is connected to PB5 (digital out 13)
+     3: 
+     4: .include "./m328Pdef.inc"
+ -> Warning 009: Include defs not necessary, using internal values!
+   File: hello.asm, Line: 4
+   Source line: .include "./m328Pdef.inc"
+     5: 
+     6: 000000   E200  ldi r16,0b00100000
+     7: 000001   B904  out DDRB,r16
+     8: 000002   B905  out PortB,r16
+     9: Start:
+    10: 000003   CFFF  rjmp Start
+
+Program             :        4 words.
+Constants           :        0 words.
+Total program memory:        4 words.
+Eeprom space        :        0 bytes.
+Data segment        :        0 bytes.
+Compilation completed, no errors.
+Compilation endet 24.05.2020, 18:06:18
