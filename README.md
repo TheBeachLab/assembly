@@ -1,4 +1,8 @@
-# Assembly with arduino
+# Assembly with arduino board
+
+## Install vim avr syntax
+
+Copy avr.vim to `~/.vim/syntax/`
 
 ## Connection
 
