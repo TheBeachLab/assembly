@@ -1,5 +1,9 @@
 # Assembly with arduino board
 
+## Get the tools
+
+Install `avrdude` and get `gavrasm` from [here](http://www.avr-asm-tutorial.net/gavrasm/index_en.html)
+
 ## Install vim avr syntax
 
 Copy avr.vim to `~/.vim/syntax/`
