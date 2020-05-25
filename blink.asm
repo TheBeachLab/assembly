@@ -46,7 +46,8 @@ START:
 ; SPL stack pointer low, SPH stack pointer high
 ; SPH needed because
 ; atmega328 has 2kb sram
-; stack not used in this example
+; needed to be able to call subroutines
+; also needed for interrupts
 ldi r16, low(RAMEND)	; load the start address of the sram in r16
 out SPL, r16		; store r16 (start address) in SPL register
 ldi r16, high(RAMEND)	; load the end address of the sram in r16
