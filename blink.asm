@@ -6,11 +6,12 @@
 ; at 16MHz is 8M clock cycles
 
 .INCLUDE "m328pdef.inc"	; directive to include 
+
 .CSEG			; code segment (there are eeprom .ESEG and sram .DSEG)
 .ORG 0x0000		; the next instruction has to be written to address 0x0000
 
-rjmp START	; the reset vector: jump to "main"
 		; Vector	Interrupt definition		Vector name
+rjmp START	; 1		reset vector			RESET
 		; 2		External Interrupt Request 0 	INT0_vect
 		; 3 		External Interrupt Request 1 	INT1_vect
 		; 4 		Pin Change Interrupt Request 0 	PCINT0_vect
@@ -59,7 +60,7 @@ LOOP:
 sbi PORTB, 5	; switch on the LED  
 rcall delay_05	; wait for half a second  
 cbi PORTB, 5	; switch it off  
-rcall delay_05	; wait for half a second  
+rcall delay_05	; 3cc wait for half a second  
 rjmp LOOP	; jump to loop
 
 DELAY_05:	; the subroutine:  
@@ -90,6 +91,6 @@ brne OUTER_LOOP	; 2cc and loop if outer loop not finished
 ; redo the math
 ; (65535-1021)*4=258056 cc + 3cc overflow + 2cc ldi = 258061 cc
 ; +3cc = 258064*31=7999984
-; +8cc overfow + 1cc ldi r16 + 1cc rcall + 1cc ret = 7999995 cc
+; +8cc overfow + 1cc ldi r16 + 3cc rcall + 4cc ret = 8000000 cc
   
-ret	; 1cc return from rcall subroutine
+ret	; 4cc return from rcall subroutine
