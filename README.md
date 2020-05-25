@@ -2,7 +2,7 @@
 
 ## Get ready
 
-- Install `avrdude` and get `gavrasm` compiler from [here](http://www.avr-asm-tutorial.net/gavrasm/index_en.html)
+- Install `avrdude` and get `avra` or `gavrasm` compiler
 - Connect the Arduino board to the usbtiny programmer as shown in the picture below.
 ![isp](isp2.jpg)
 - Compile the program `gavrasm hello.asm`

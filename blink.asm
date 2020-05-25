@@ -5,7 +5,7 @@
 ; every half a second
 ; at 16MHz is 8M clock cycles
 
-.INCLUDE "m328pdef.inc"	; directive to include 
+.include "m328pdef.inc"	; directive to include 
 
 .CSEG			; code segment (there are eeprom .ESEG and sram .DSEG)
 .ORG 0x0000		; the next instruction has to be written to address 0x0000

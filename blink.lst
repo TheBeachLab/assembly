@@ -3,7 +3,7 @@ gavrasm Gerd's AVR assembler version 4.6 (C)2019 by DG4FAC
 Source file: blink.asm
 Hex file:    blink.hex
 Eeprom file: blink.eep
-Compiled:    25.05.2020, 02:54:41
+Compiled:    25.05.2020, 05:58:06
 Pass:        2
      1: ; Hello world blink
      2: ; by Fran Sanchez 2020
@@ -12,68 +12,99 @@ Pass:        2
      5: ; every half a second
      6: ; at 16MHz is 8M clock cycles
      7: 
-     8: .INCLUDE "m328pdef.inc"	; directive to include 
+     8: .include "m328pdef.inc"	; directive to include 
  -> Warning 009: Include defs not necessary, using internal values!
    File: blink.asm, Line: 8
-   Source line: .INCLUDE "m328pdef.inc"	; directive to include 
-     9: .ORG 0x0000		; the next instruction has to be written to address 0x0000
-    10: 
-    11: 000000   C000  rjmp START	; the reset vector: jump to "main"
+   Source line: .include "m328pdef.inc"	; directive to include 
+     9: 
+    10: .CSEG			; code segment (there are eeprom .ESEG and sram .DSEG)
+    11: .ORG 0x0000		; the next instruction has to be written to address 0x0000
     12: 
-    13: START:
-    14: 
-    15: ; set up the sram stack SPL:HPL
-    16: ; SPL stack pointer low, SPH stack pointer high
-    17: ; SPH needed because
-    18: ; atmega328 has 2kb sram
-    19: ; stack not used in this example
-    20: 000001   EF0F  ldi r16, low(RAMEND)	; load the start address of the sram in r16
-    21: 000002   BF0D  out SPL, r16		; store r16 (start address) in SPL register
-    22: 000003   E008  ldi r16, high(RAMEND)	; load the end address of the sram in r16
-    23: 000004   BF0E  out SPH, r16		; store r16 (end address) in SPH register
-    24: 
-    25: ; set up DDRB where led is located
-    26: 000005   EF0F  ldi r16, 0xFF	; load register 16 with 0xFF (all bits 1)
-    27: 000006   B904  out DDRB, r16	; write the value in r16 (0xFF) to DDRB   
-    28: 
-    29: LOOP:  
-    30: 000007   9A2D  sbi PORTB, 5	; switch on the LED  
-    31: 000008   D003  rcall delay_05	; wait for half a second  
-    32: 000009   982D  cbi PORTB, 5	; switch it off  
-    33: 00000A   D001  rcall delay_05	; wait for half a second  
-    34: 00000B   CFFB  rjmp LOOP	; jump to loop
-    35: 
-    36: DELAY_05:	; the subroutine:  
-    37: 00000C   E10F  ldi r16, 31	; 1cc load r16 with 31
-    38: 
-    39: OUTER_LOOP:		; outer loop label  
-    40: 00000D   EF8D  ldi r24, low(1021)	; load registers r24:r25 with 1021, our new init value  
-    41: 00000E   E093  ldi r25, high(1021)	; 2cc total
+    13: 		; Vector	Interrupt definition		Vector name
+    14: 000000   C000  rjmp START	; 1		reset vector			RESET
+    15: 		; 2		External Interrupt Request 0 	INT0_vect
+    16: 		; 3 		External Interrupt Request 1 	INT1_vect
+    17: 		; 4 		Pin Change Interrupt Request 0 	PCINT0_vect
+    18: 		; 5 		Pin Change Interrupt Request 1 	PCINT1_vect
+    19: 		; 6 		Pin Change Interrupt Request 2 	PCINT2_vect
+    20: 		; 7 		Watchdog Time-out Interrupt 	WDT_vect
+    21: 		; 8 		Timer/Counter2 Compare Match A 	TIMER2_COMPA_vect
+    22: 		; 9 		Timer/Counter2 Compare Match B 	TIMER2_COMPB_vect
+    23: 		; 10		Timer/Counter2 Overflow 	TIMER2_OVF_vect
+    24: 		; 11		Timer/Counter1 Capture Event 	TIMER1_CAPT_vect
+    25: 		; 12		Timer/Counter1 Compare Match A 	TIMER1_COMPA_vect
+    26: 		; 13		Timer/Counter1 Compare Match B 	TIMER1_COMPB_vect
+    27: 		; 14		Timer/Counter1 Overflow 	TIMER1_OVF_vect
+    28: 		; 15		Timer/Counter0 Compare Match A 	TIMER0_COMPA_vect
+    29: 		; 16		Timer/Counter0 Compare Match B 	TIMER0_COMPB_vect
+    30: 		; 17		Timer/Counter0 Overflow 	TIMER0_OVF_vect
+    31: 		; 18		SPI Serial Transfer Complete 	SPI_STC_vect
+    32: 		; 19		USART Rx Complete 	USART_RX_vect
+    33: 		; 20		USART Data Register Empty 	USART_UDRE_vect
+    34: 		; 21		USART Tx Complete 	USART_TX_vect
+    35: 		; 22		ADC Conversion Complete 	ADC_vect
+    36: 		; 23		EEPROM Ready 	EE_READY_vect
+    37: 		; 24		Analog Comparator 	ANALOG_COMP_vect
+    38: 		; 25		Two-wire Serial Interface 	TWI_vect
+    39: 		; 26		Store Program Memory Read 	SPM_READY_vect
+    40: 
+    41: 
     42: 
-    43: DELAY_LOOP:	; the loop label         
-    44: 00000F   9601  adiw r24, 1	; 2cc - increment word r24:r25    
-    45: 000010   F7F1  brne DELAY_LOOP	; 2cc - if no overflow ("branch if not equal to 0"), go back to "delay_loop"
-    46: ; outer loop takes
-    47: ; 2cc for the 2 ldi
-    48: ; + the delay loop
-    49: ; if r24:r25 was loaded with 0, it would overflow at 65535
-    50: ; 65535*4=262140 cc
-    51: ; + 3cc overflow
-    52: ; total 262145 
-    53: 
-    54: 000011   950A  dec r16		; 1cc decrement r16  
-    55: 000012   F7D1  brne OUTER_LOOP	; 2cc and loop if outer loop not finished
-    56: ; +3 cc
-    57: ; total 262148*31=8126588
-    58: ; excess of 126588 cc
-    59: ; load a bigger number in r24:r25
-    60: ; 126588/31= 4083.48... cc
-    61: ; redo the math
-    62: ; (65535-1021)*4=258056 cc + 3cc overflow + 2cc ldi = 258061 cc
-    63: ; +3cc = 258064*31=7999984
-    64: ; +8cc overfow + 1cc ldi r16 + 1cc rcall + 1cc ret = 7999995 cc
-    65:   
-    66: 000013   9508  ret	; 1cc return from rcall subroutine
+    43: START:
+    44: 
+    45: ; set up the sram stack SPL:HPL
+    46: ; SPL stack pointer low, SPH stack pointer high
+    47: ; SPH needed because
+    48: ; atmega328 has 2kb sram
+    49: ; needed to be able to call subroutines
+    50: ; also needed for interrupts
+    51: 000001   EF0F  ldi r16, low(RAMEND)	; load the start address of the sram in r16
+    52: 000002   BF0D  out SPL, r16		; store r16 (start address) in SPL register
+    53: 000003   E008  ldi r16, high(RAMEND)	; load the end address of the sram in r16
+    54: 000004   BF0E  out SPH, r16		; store r16 (end address) in SPH register
+    55: 
+    56: ; set up DDRB where led is located
+    57: 000005   EF0F  ldi r16, 0xFF	; load register 16 with 0xFF (all bits 1)
+    58: 000006   B904  out DDRB, r16	; write the value in r16 (0xFF) to DDRB   
+    59: 
+    60: LOOP:  
+    61: 000007   9A2D  sbi PORTB, 5	; switch on the LED  
+    62: 000008   D003  rcall delay_05	; wait for half a second  
+    63: 000009   982D  cbi PORTB, 5	; switch it off  
+    64: 00000A   D001  rcall delay_05	; 3cc wait for half a second  
+    65: 00000B   CFFB  rjmp LOOP	; jump to loop
+    66: 
+    67: DELAY_05:	; the subroutine:  
+    68: 00000C   E10F  ldi r16, 31	; 1cc load r16 with 31
+    69: 
+    70: OUTER_LOOP:		; outer loop label  
+    71: 00000D   EF8D  ldi r24, low(1021)	; load registers r24:r25 with 1021, our new init value  
+    72: 00000E   E093  ldi r25, high(1021)	; 2cc total
+    73: 
+    74: DELAY_LOOP:	; the loop label         
+    75: 00000F   9601  adiw r24, 1	; 2cc - increment word r24:r25    
+    76: 000010   F7F1  brne DELAY_LOOP	; 2cc - if no overflow ("branch if not equal to 0"), go back to "delay_loop"
+    77: ; outer loop takes
+    78: ; 2cc for the 2 ldi
+    79: ; + the delay loop
+    80: ; if r24:r25 was loaded with 0, it would overflow at 65535
+    81: ; 65535*4=262140 cc
+    82: ; + 3cc overflow
+    83: ; total 262145 
+    84: 
+    85: 000011   950A  dec r16		; 1cc decrement r16  
+    86: 000012   F7D1  brne OUTER_LOOP	; 2cc and loop if outer loop not finished
+    87: ; +3 cc
+    88: ; total 262148*31=8126588
+    89: ; excess of 126588 cc
+    90: ; load a bigger number in r24:r25
+    91: ; 126588/31= 4083.48... cc
+    92: ; redo the math
+    93: ; (65535-1021)*4=258056 cc + 3cc overflow + 2cc ldi = 258061 cc
+    94: ; +3cc = 258064*31=7999984
+    95: ; +8cc overfow + 1cc ldi r16 + 3cc rcall + 4cc ret = 8000000 cc
+    96:   
+    97: 000013   9508  ret	; 4cc return from rcall subroutine
 
 Program             :       20 words.
 Constants           :        0 words.
@@ -81,4 +112,4 @@ Total program memory:       20 words.
 Eeprom space        :        0 bytes.
 Data segment        :        0 bytes.
 Compilation completed, no errors.
-Compilation endet 25.05.2020, 02:54:41
+Compilation endet 25.05.2020, 05:58:06
