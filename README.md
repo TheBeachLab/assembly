@@ -45,6 +45,18 @@ avrdude: safemode: Fuses OK (E:FD, H:D6, L:FF)
 
 `sudo avrdude -p m328p -P usb -c usbtiny -U flash:r:program.dump:i`. Note that `program.dump` must exist. `i` stands for intel hex format. Check avrdude for more info.
 
-### Download the eeprom content
+### Backup/restore the eeprom content
 
-`sudo avrdude -p m328p -P usb -c usbtiny -U eeprom:r:memory.eep:h`. Note that `memory.eep` must exist
+The eeprom is a non-volatile memory (it does not require energy to keep its content). Hence you can use it to store data that will remain even when the microcontroller is powered off. The data can be written from the code or uploaded externally.
+
+When a program is flashed the eeprom is also deleted, loosing any data you might have stored. Hence you might want to backup that data first.
+
+`sudo avrdude -p m328p -P usb -c usbtiny -U eeprom:r:memory.eep:i`. Note that the `memory.eep` file must exist beforehand.
+
+You might want to restore the eeprom data once the program has been flashed.
+
+`sudo avrdude -p m328p -P usb -c usbtiny -U eeprom:w:memory.eep:i`.
+
+But you must agree that the above procedure is annoying. You can prevent the eeprom memory being erased at the chip erase cycle by clearing the EESAVE bit (number 3) in hfuse.
+
+
