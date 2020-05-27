@@ -59,4 +59,6 @@ You might want to restore the eeprom data once the program has been flashed.
 
 But you must agree that the above procedure is annoying. You can prevent the eeprom memory being erased at the chip erase cycle by clearing the EESAVE bit (number 3) in hfuse.
 
+## Disassembling a program
+
 
