@@ -61,14 +61,14 @@ But you must agree that the above procedure is annoying. You can prevent the eep
 
 ## Disassembling a program
 
-Disassembling is the process of converting a `.hex` file back to assembly language. I use [vavrdisasm](https://github.com/vsergeev/vAVRdisasm). Usage: `vavrdisasm --assembly hello.hex`
+Disassembling is the process of converting a `.hex` file back to assembly language. I use [vavrdisasm](https://github.com/vsergeev/vAVRdisasm). Usage: `vavrdisasm --assembly --no-opcodes hello.hex`
 
 ```asm
 .org 0x0000
-A_0000: e2 00           ldi     R16, 0x20
-A_0002: b9 04           out     $04, R16
-A_0004: b9 05           out     $05, R16
-A_0006: cf ff           rjmp    A_0006  ; 0x6
+A_0000: ldi     R16, 0x20
+A_0002: out     $04, R16
+A_0004: out     $05, R16
+A_0006: rjmp    A_0006  ; 0x6
 ```
 
 Compare it with the original hello.asm
