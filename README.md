@@ -61,13 +61,14 @@ But you must agree that the above procedure is annoying. You can prevent the eep
 
 ## Disassembling a program
 
-Disassembling is the process of converting a `.hex` file back to assembly language. I use [vavrdisasm](https://github.com/vsergeev/vAVRdisasm). Usage: `vavrdisasm hello.hex`
+Disassembling is the process of converting a `.hex` file back to assembly language. I use [vavrdisasm](https://github.com/vsergeev/vAVRdisasm). Usage: `vavrdisasm --assembly hello.hex`
 
 ```asm
-   0:   e2 00           ldi     R16, 0x20
-   2:   b9 04           out     $04, R16
-   4:   b9 05           out     $05, R16
-   6:   cf ff           rjmp    .-2     ; 0x6
+.org 0x0000
+A_0000: e2 00           ldi     R16, 0x20
+A_0002: b9 04           out     $04, R16
+A_0004: b9 05           out     $05, R16
+A_0006: cf ff           rjmp    A_0006  ; 0x6
 ```
 
 Compare it with the original hello.asm
@@ -78,9 +79,13 @@ Compare it with the original hello.asm
 
 .include "./m328Pdef.inc"
 
-        ldi r16,0b00100000
-        out DDRB,r16
-        out PortB,r16
+        ldi     r16,0b00100000
+        out     DDRB,r16
+        out     PORTB,r16
 Start:
-        rjmp Start
+        rjmp    Start
 ```
+
+As you can see 0x20 = 0b100000. 
+
+Looking at the datasheet DDRB has 0x04 address in the **data** memory map (AVR has Harvard architecture so data and program memories are separated. `$04` refers to the offset address in the I/O section of the memory (for the `out` instruction).
