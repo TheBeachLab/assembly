@@ -48,32 +48,33 @@ START:
 ; atmega328 has 2kb sram
 ; needed to be able to call subroutines
 ; also needed for interrupts
-ldi r16, low(RAMEND)	; load the start address of the sram in r16
-out SPL, r16		; store r16 (start address) in SPL register
-ldi r16, high(RAMEND)	; load the end address of the sram in r16
-out SPH, r16		; store r16 (end address) in SPH register
+	ldi 	r16, low(RAMEND)	; load the start address of the sram in r16
+	out 	SPL, r16		; store r16 (start address) in SPL register
+	ldi 	r16, high(RAMEND)	; load the end address of the sram in r16
+	out 	SPH, r16		; store r16 (end address) in SPH register
 
 ; set up DDRB where led is located
-ldi r16, 0xFF	; load register 16 with 0xFF (all bits 1)
-out DDRB, r16	; write the value in r16 (0xFF) to DDRB   
+	ldi 	r16, 0xFF		; load register 16 with 0xFF (all bits 1)
+	out 	DDRB, r16		; write the value in r16 (0xFF) to DDRB   
 
 LOOP:  
-sbi PORTB, 5	; switch on the LED  
-rcall delay_05	; wait for half a second  
-cbi PORTB, 5	; switch it off  
-rcall delay_05	; 3cc wait for half a second  
-rjmp LOOP	; jump to loop
+	sbi 	PORTB, 5		; switch on the LED  
+	rcall 	delay_05		; wait for half a second  
+	cbi 	PORTB, 5		; switch it off  
+	rcall 	delay_05		; 3cc wait for half a second  
+	rjmp 	LOOP			; jump to loop
 
-DELAY_05:	; the subroutine:  
-ldi r16, 31	; 1cc load r16 with 31
+DELAY_05:				; the subroutine:  
+	ldi 	r16, 31			; 1cc load r16 with 31
 
-OUTER_LOOP:		; outer loop label  
-ldi r24, low(1021)	; load registers r24:r25 with 1021, our new init value  
-ldi r25, high(1021)	; 2cc total
+OUTER_LOOP:				; outer loop label  
+	ldi 	r24, low(1021)		; load registers r24:r25 with 1021, our new init value  
+	ldi 	r25, high(1021)		; 2cc total
 
-DELAY_LOOP:	; the loop label         
-adiw r24, 1	; 2cc - increment word r24:r25    
-brne DELAY_LOOP	; 2cc - if no overflow ("branch if not equal to 0"), go back to "delay_loop"
+DELAY_LOOP:				; the loop label         
+	adiw 	r24, 1			; 2cc - increment word r24:r25    
+	brne 	DELAY_LOOP		; 2cc - if no overflow ("branch if not equal to 0"), go back to "delay_loop"
+
 ; outer loop takes
 ; 2cc for the 2 ldi
 ; + the delay loop
@@ -82,8 +83,9 @@ brne DELAY_LOOP	; 2cc - if no overflow ("branch if not equal to 0"), go back to 
 ; + 3cc overflow
 ; total 262145 
 
-dec r16		; 1cc decrement r16  
-brne OUTER_LOOP	; 2cc and loop if outer loop not finished
+	dec 	r16			; 1cc decrement r16  
+	brne 	OUTER_LOOP		; 2cc and loop if outer loop not finished
+
 ; +3 cc
 ; total 262148*31=8126588
 ; excess of 126588 cc
@@ -94,4 +96,4 @@ brne OUTER_LOOP	; 2cc and loop if outer loop not finished
 ; +3cc = 258064*31=7999984
 ; +8cc overfow + 1cc ldi r16 + 3cc rcall + 4cc ret = 8000000 cc
   
-ret	; 4cc return from rcall subroutine
+	ret				; 4cc return from rcall subroutine
